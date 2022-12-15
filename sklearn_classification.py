@@ -7,7 +7,7 @@
 # SVM poly
 # SVM sigmoid
 
-import os, re, time, spacy
+import os, re, time
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 import numpy as np
@@ -78,6 +78,7 @@ def oversapling(X:np.ndarray, y:np.ndarray):
 
 def pln_preprocessed(X:np.ndarray):
 	if not os.path.exists(CHECKPOINT_FILENAME_1):	
+		import spacy
 		nlp = spacy.load("es_core_news_lg")
 		
 		X_preprocessed = []
