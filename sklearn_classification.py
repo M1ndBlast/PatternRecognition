@@ -103,40 +103,6 @@ def pln_preprocessed(X:np.ndarray):
 
 	return X_preprocessed, vocabulary
 
-
-def getNN(
-	hidden_layers:tuple, 
-	learning_rate:float=0.1, 
-	in_num:int=100, 
-	out_num:int=5, 
-	activation_hidden:nn.Module=nn.ReLU(), 
-	activation_output:nn.Module=nn.Sigmoid(), 
-	backpropagation_fun:optim.Optimizer=optim.Adam
-):
-	layers = []
-	for i in range(0, hidden_layers[0]+1):
-		activation = activation_hidden
-		if i==hidden_layers[0]:
-			activation = activation_output
-
-		print(f'({in_num if i==0 else hidden_layers[1]},{out_num if i==hidden_layers[0] else hidden_layers[1]})', end='\n' if i==hidden_layers[0] else ' -> ')
-
-		layer = nn.Linear(
-			in_num if i==0 else hidden_layers[1], 
-			out_num if i==hidden_layers[0] else hidden_layers[1],
-			False
-		)
-		
-		layers.append((f'layer{i}', layer))
-		layers.append((f'fun{i}', activation))
-
-	from collections import OrderedDict
-	model = nn.Sequential(OrderedDict(layers))
-	optimizer = backpropagation_fun(model.parameters(), lr=learning_rate)
-
-	return model, optimizer
-
-
 if __name__=="__main__":
 	### BEGIN DATASET LOADING ###
 	if os.path.exists(CHECKPOINT_FILENAME_2_x):
@@ -213,6 +179,38 @@ if __name__=="__main__":
 	restmex_Y = np.reshape(restmex_Y, (restmex_Y.shape[0],))
 	restmex_X = t.FloatTensor(restmex_X)
 	restmex_Y = t.LongTensor(restmex_Y)-1
+
+	def getNN(
+		hidden_layers:tuple, 
+		learning_rate:float=0.1, 
+		in_num:int=100, 
+		out_num:int=5, 
+		activation_hidden:nn.Module=nn.ReLU(), 
+		activation_output:nn.Module=nn.Sigmoid(), 
+		backpropagation_fun:optim.Optimizer=optim.Adam
+	):
+		layers = []
+		for i in range(0, hidden_layers[0]+1):
+			activation = activation_hidden
+			if i==hidden_layers[0]:
+				activation = activation_output
+
+			print(f'({in_num if i==0 else hidden_layers[1]},{out_num if i==hidden_layers[0] else hidden_layers[1]})', end='\n' if i==hidden_layers[0] else ' -> ')
+
+			layer = nn.Linear(
+				in_num if i==0 else hidden_layers[1], 
+				out_num if i==hidden_layers[0] else hidden_layers[1],
+				False
+			)
+			
+			layers.append((f'layer{i}', layer))
+			layers.append((f'fun{i}', activation))
+
+		from collections import OrderedDict
+		model = nn.Sequential(OrderedDict(layers))
+		optimizer = backpropagation_fun(model.parameters(), lr=learning_rate)
+		return model, optimizer
+
 
 	nnClassifier, opt = getNN(
 		hidden_layers = (2, restmex_X.shape[1]//3),
